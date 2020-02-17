@@ -16,7 +16,8 @@ public:
 
     void SetPublisher(ros::Publisher publisher);
     void Do(const sensor_msgs::PointCloud2::ConstPtr& msg);
-
+    void VisualizeData(const sensor_msgs::PointCloud2::ConstPtr& msg);
+    
 private:
     ros::Publisher m_publisher;
     cv::Mat m_image;
