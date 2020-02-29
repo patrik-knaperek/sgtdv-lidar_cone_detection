@@ -36,7 +36,7 @@ void LidarConeDetection::Do(const sensor_msgs::PointCloud2::ConstPtr& msg)
 
         point.x = *temp;
         point.y = *(temp + 1);
-        point.z = *(temp + 2);
+        //point.z = *(temp + 2);
 
         if (point.z > 0.1)
         {
