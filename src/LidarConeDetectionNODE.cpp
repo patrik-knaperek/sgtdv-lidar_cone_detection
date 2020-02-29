@@ -1,3 +1,9 @@
+/*****************************************************/
+//Organization: Stuba Green Team
+//Authors: Juraj Krasňanský
+/*****************************************************/
+
+
 #include <ros/ros.h>
 #include "../include/LidarConeDetectionSynch.h"
 #include <std_msgs/Empty.h>

@@ -1,3 +1,9 @@
+/*****************************************************/
+//Organization: Stuba Green Team
+//Authors: Juraj Krasňanský
+/*****************************************************/
+
+
 #include "../include/LidarConeDetectionSynch.h"
 
 LidarConeDetectionSynch::LidarConeDetectionSynch()
