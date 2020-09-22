@@ -35,8 +35,6 @@ void LidarConeDetection::Do(const sensor_msgs::PointCloud2::ConstPtr& msg)
     m_coneCoords.reserve(20);
     coneCoordsMsg->points.reserve(20);
 
-    std::cout << "Dlzka spravy: " << msg->width << std::endl; 
-
     for (int i = 0; i < msg->width; i++)
     {
         temp = reinterpret_cast<const float*>(&msg->data[i*msg->point_step]);
@@ -44,7 +42,7 @@ void LidarConeDetection::Do(const sensor_msgs::PointCloud2::ConstPtr& msg)
 
         point.x = *temp;
         point.y = *(temp + 1);
-        //point.z = *(temp + 2);
+        point.z = *(temp + 2);
 
         if (point.z > 0.1)
         {
@@ -52,9 +50,7 @@ void LidarConeDetection::Do(const sensor_msgs::PointCloud2::ConstPtr& msg)
         }
     }
 
-    HoughCircles(m_image, m_coneCoords, CV_HOUGH_GRADIENT, 2, 50., 255, 15, 5, 15);
-	
-    std::cout << "Najdene: " << m_coneCoords.size() << std::endl;    
+    HoughCircles(m_image, m_coneCoords, CV_HOUGH_GRADIENT, 2, 50., 255, 15, 5, 15); 
 
     for(size_t i = 0; i < m_coneCoords.size(); i++)
     {
@@ -67,6 +63,30 @@ void LidarConeDetection::Do(const sensor_msgs::PointCloud2::ConstPtr& msg)
     }
 
     m_publisher.publish(coneCoordsMsg);
+
+     
+
+
+////////////////    VIZUALIZACIA    /////////////////
+
+//     cvtColor(m_image, m_image, CV_GRAY2BGR);
+
+//    for( size_t i = 0; i < m_coneCoords.size(); i++ )
+//     {
+//         cv::Point center(cvRound(m_coneCoords[i][0]), cvRound(m_coneCoords[i][1]));
+//         int radius = cvRound(m_coneCoords[i][2]);
+//         //circle center
+//         circle(m_image, center, 3, cv::Scalar(0,255,0), -1, 8, 0 );
+//         //circle outline
+//         circle(m_image, center, radius, cv::Scalar(0,0,255), 3, 8, 0 );
+//     }
+    
+
+//   cv::imshow("Orig", m_image);
+//   cv::waitKey(0);
+//   getchar();
+
+//   cvtColor(m_image, m_image, CV_BGR2GRAY);
 }
 
 void LidarConeDetection::SetPublisher(ros::Publisher publisher)
@@ -181,50 +201,50 @@ void LidarConeDetection::VisualizeData(const sensor_msgs::PointCloud2::ConstPtr&
 
     HoughCircles(m_image, m_coneCoords, CV_HOUGH_GRADIENT, 2, minDist, 255, 15, 5, 15);
 
-    cubes.points.reserve(m_coneCoords.size());
+    // cubes.points.reserve(m_coneCoords.size());
 
-    for(size_t i = 0; i < m_coneCoords.size(); i++)
-    {
-        geometry_msgs::Point point;
-        cv::Point2d dPoint = getSpaceCoords(cv::Point2i(m_coneCoords[i][0], m_coneCoords[i][1]));
-        point.x = dPoint.y;
-        point.y = dPoint.x;
-        point.z = 0.;
+    // for(size_t i = 0; i < m_coneCoords.size(); i++)
+    // {
+    //     geometry_msgs::Point point;
+    //     cv::Point2d dPoint = getSpaceCoords(cv::Point2i(m_coneCoords[i][0], m_coneCoords[i][1]));
+    //     point.x = dPoint.y;
+    //     point.y = dPoint.x;
+    //     point.z = 0.;
 
-        cubes.points.push_back(point);
+    //     cubes.points.push_back(point);
 
-        point.z += 1.;
+    //     point.z += 1.;
 
-        cubes.points.push_back(point);
-    }
+    //     cubes.points.push_back(point);
+    // }
 
-    m_publisher.publish(points);
+    // m_publisher.publish(points);
 
-    if(cubes.points.size() > 0)
-    {
-        m_publisher.publish(cubes);
-    }    
+    // if(cubes.points.size() > 0)
+    // {
+    //     m_publisher.publish(cubes);
+    // }    
 
     //Will show image with detected cones. You have to close the image window and enter some char to console to continue.
-/* 
-    cvtColor(m_image, m_image, CV_GRAY2BGR);
+ 
+//     cvtColor(m_image, m_image, CV_GRAY2BGR);
 
-   for( size_t i = 0; i < m_coneCoords.size(); i++ )
-    {
-        cv::Point center(cvRound(m_coneCoords[i][0]), cvRound(m_coneCoords[i][1]));
-        int radius = cvRound(m_coneCoords[i][2]);
-        // circle center
-        circle(m_image, center, 3, cv::Scalar(0,255,0), -1, 8, 0 );
-        // circle outline
-        circle(m_image, center, radius, cv::Scalar(0,0,255), 3, 8, 0 );
-    }
+//    for( size_t i = 0; i < m_coneCoords.size(); i++ )
+//     {
+//         cv::Point center(cvRound(m_coneCoords[i][0]), cvRound(m_coneCoords[i][1]));
+//         int radius = cvRound(m_coneCoords[i][2]);
+//         //circle center
+//         circle(m_image, center, 3, cv::Scalar(0,255,0), -1, 8, 0 );
+//         //circle outline
+//         circle(m_image, center, radius, cv::Scalar(0,0,255), 3, 8, 0 );
+//     }
     
 
-  cv::imshow("Orig", m_image);
-  cv::waitKey(0);
-  getchar();
+//   cv::imshow("Orig", m_image);
+//   cv::waitKey(0);
+//   getchar();
 
-  cvtColor(m_image, m_image, CV_BGR2GRAY);
-  */
+//   cvtColor(m_image, m_image, CV_BGR2GRAY);
+  
      
 }
