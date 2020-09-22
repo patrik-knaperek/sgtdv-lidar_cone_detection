@@ -35,6 +35,8 @@ void LidarConeDetection::Do(const sensor_msgs::PointCloud2::ConstPtr& msg)
     m_coneCoords.reserve(20);
     coneCoordsMsg->points.reserve(20);
 
+    std::cout << "Dlzka spravy: " << msg->width << std::endl; 
+
     for (int i = 0; i < msg->width; i++)
     {
         temp = reinterpret_cast<const float*>(&msg->data[i*msg->point_step]);
@@ -51,6 +53,8 @@ void LidarConeDetection::Do(const sensor_msgs::PointCloud2::ConstPtr& msg)
     }
 
     HoughCircles(m_image, m_coneCoords, CV_HOUGH_GRADIENT, 2, 50., 255, 15, 5, 15);
+	
+    std::cout << "Najdene: " << m_coneCoords.size() << std::endl;    
 
     for(size_t i = 0; i < m_coneCoords.size(); i++)
     {
