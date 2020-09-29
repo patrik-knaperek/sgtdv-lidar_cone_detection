@@ -23,7 +23,6 @@ catkin_package(
     CATKIN_DEPENDS sgtdv_msgs
     CATKIN_DEPENDS visualization_msgs
     CATKIN_DEPENDS sensor_msgs
-    CATKIN_DEPENDS sgtdv_msgs
 )
 
 include_directories(
