@@ -8,6 +8,7 @@
 #include "LidarConeDetection.h"
 #include <std_msgs/Empty.h>
 #include <sensor_msgs/PointCloud2.h>
+#include "../../SGT_Macros.h"
 
 class LidarConeDetectionSynch
 {
@@ -18,6 +19,10 @@ public:
     void ReceiveSignal(const std_msgs::Empty::ConstPtr &msg);
     void Do(const sensor_msgs::PointCloud2::ConstPtr &msg);
     void SetPublisher(ros::Publisher publisher);
+
+#ifdef DEBUG_STATE
+    void SetVisDebugPublisher(ros::Publisher publisher) { m_lidarConeDetection.SetVisDebugPublisher(publisher); }
+#endif
 
 private:    
     LidarConeDetection m_lidarConeDetection;

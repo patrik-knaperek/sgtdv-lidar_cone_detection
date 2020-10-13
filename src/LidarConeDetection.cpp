@@ -26,14 +26,19 @@ LidarConeDetection::~LidarConeDetection()
 
 void LidarConeDetection::Do(const sensor_msgs::PointCloud2::ConstPtr& msg)
 {
+#ifdef DEBUG_STATE
+    sgtdv_msgs::DebugState state;
+    state.workingState = 1;
+    m_visDebugPublisher.publish(state);
+#endif
+
     sgtdv_msgs::Point2DArrPtr coneCoordsMsg(new sgtdv_msgs::Point2DArr);
     float const *temp;
 
     m_image = cv::Scalar(255, 255, 255);
     m_coneCoords.clear();
 
-    m_coneCoords.reserve(20);
-    coneCoordsMsg->points.reserve(20);
+    m_coneCoords.reserve(20);       //netusim ci to pomaha opencv ale preco nie
 
     for (int i = 0; i < msg->width; i++)
     {
@@ -52,6 +57,8 @@ void LidarConeDetection::Do(const sensor_msgs::PointCloud2::ConstPtr& msg)
 
     HoughCircles(m_image, m_coneCoords, CV_HOUGH_GRADIENT, 2, 50., 255, 15, 5, 15); 
 
+    coneCoordsMsg->points.reserve(m_coneCoords.size());
+
     for(size_t i = 0; i < m_coneCoords.size(); i++)
     {
         sgtdv_msgs::Point2D point;
@@ -64,7 +71,11 @@ void LidarConeDetection::Do(const sensor_msgs::PointCloud2::ConstPtr& msg)
 
     m_publisher.publish(coneCoordsMsg);
 
-     
+#ifdef DEBUG_STATE
+    state.numOfCones = static_cast<uint32_t>(m_coneCoords.size());
+    state.workingState = 0;
+    m_visDebugPublisher.publish(state);
+#endif
 
 
 ////////////////    VIZUALIZACIA    /////////////////

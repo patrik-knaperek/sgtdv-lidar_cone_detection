@@ -6,6 +6,8 @@
 
 #include <ros/ros.h>
 #include "../include/LidarConeDetectionSynch.h"
+#include "../../SGT_Macros.h"
+#include <sgtdv_msgs/DebugState.h>
 #include <std_msgs/Empty.h>
 #include <sgtdv_msgs/Point2DArr.h>
 #include <sensor_msgs/PointCloud2.h>
@@ -17,6 +19,11 @@ int main (int argc, char** argv)
     ros::init(argc, argv, "lidarConeDetection");
     ros::NodeHandle handle;
     ros::Publisher publisher = handle.advertise<sgtdv_msgs::Point2DArr>("lidar_cones", 1);
+
+#ifdef DEBUG_STATE
+    ros::Publisher lidarConeDetectionDebugStatePublisher = handle.advertise<sgtdv_msgs::DebugState>("lidar_cone_detection_debug_state", 1);
+    synchObj.SetVisDebugPublisher(lidarConeDetectionDebugStatePublisher);
+#endif
 
     synchObj.SetPublisher(publisher);    
 

@@ -14,6 +14,8 @@
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 #include <opencv2/highgui/highgui_c.h>
+#include "../../SGT_Macros.h"
+#include <sgtdv_msgs/DebugState.h>
 
 class LidarConeDetection
 {
@@ -24,6 +26,10 @@ public:
     void SetPublisher(ros::Publisher publisher);
     void Do(const sensor_msgs::PointCloud2::ConstPtr& msg);
     void VisualizeData(const sensor_msgs::PointCloud2::ConstPtr& msg);
+
+#ifdef DEBUG_STATE
+    void SetVisDebugPublisher(ros::Publisher publisher) { m_visDebugPublisher = publisher; }
+#endif
     
 private:
     ros::Publisher m_publisher;
@@ -36,6 +42,10 @@ private:
     int m_pointRadius;
     cv::Point2i m_imgOrigin;
     std::vector<cv::Vec3f> m_coneCoords;
+
+#ifdef DEBUG_STATE
+    ros::Publisher m_visDebugPublisher;
+#endif
 
     void DrawPointToImage(const cv::Point2d &spacePoint);
     cv::Point2d getSpaceCoords(const cv::Point2i &imgPoint) const;
