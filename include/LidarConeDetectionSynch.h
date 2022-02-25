@@ -22,6 +22,7 @@ public:
 
 #ifdef DEBUG_STATE
     void SetVisDebugPublisher(ros::Publisher publisher) { m_lidarConeDetection.SetVisDebugPublisher(publisher); }
+    void SetFilteredPointsMarkerPublisher(ros::Publisher publisher) { m_lidarConeDetection.SetFilteredPointsMarkerPublisher(publisher); }
 #endif
 
 private:    

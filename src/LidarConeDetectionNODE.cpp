@@ -12,8 +12,7 @@
 #include <sgtdv_msgs/Point2DArr.h>
 #include <sensor_msgs/PointCloud2.h>
 
-int main (int argc, char** argv)
-{
+int main(int argc, char **argv) {
     LidarConeDetectionSynch synchObj;
 
     ros::init(argc, argv, "lidarConeDetection");
@@ -23,13 +22,16 @@ int main (int argc, char** argv)
 #ifdef DEBUG_STATE
     ros::Publisher lidarConeDetectionDebugStatePublisher = handle.advertise<sgtdv_msgs::DebugState>("lidar_cone_detection_debug_state", 1);
     synchObj.SetVisDebugPublisher(lidarConeDetectionDebugStatePublisher);
+
+    ros::Publisher lidarConeDetectionFilteredDataPublisher = handle.advertise<visualization_msgs::MarkerArray>("lidar_cone_detection_filtered_data", 1);
+    synchObj.SetFilteredPointsMarkerPublisher(lidarConeDetectionFilteredDataPublisher);
 #endif
 
-    synchObj.SetPublisher(publisher);    
+    synchObj.SetPublisher(publisher);
 
     ros::Subscriber cameraSub = handle.subscribe("camera_ready", 1, &LidarConeDetectionSynch::ReceiveSignal, &synchObj);
     ros::Subscriber pclSub = handle.subscribe("velodyne_points", 1, &LidarConeDetectionSynch::Do, &synchObj);
-    
+
     ros::spin();
 
     return 0;
