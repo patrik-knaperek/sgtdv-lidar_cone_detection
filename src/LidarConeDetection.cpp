@@ -1,6 +1,6 @@
 /*****************************************************/
 //Organization: Stuba Green Team
-//Authors: Juraj Krasňanský
+//Authors: Juraj Krasňanský, Matej Dudák
 /*****************************************************/
 
 
@@ -13,7 +13,7 @@ LidarConeDetection::~LidarConeDetection() {
 }
 
 void LidarConeDetection::Do(const sensor_msgs::PointCloud2::ConstPtr &msg) {
-#ifdef DEBUG_STATE
+#ifdef SGT_DEBUG_STATE
     sgtdv_msgs::DebugState state;
     state.workingState = 1;
     m_visDebugPublisher.publish(state);
@@ -92,45 +92,13 @@ void LidarConeDetection::Do(const sensor_msgs::PointCloud2::ConstPtr &msg) {
 
     m_publisher.publish(coneArray);
 
-#ifdef DEBUG_STATE
+#ifdef SGT_DEBUG_STATE
     state.numOfCones = coneArray->points.size();
     state.workingState = 0;
-    m_visDebugPublisher.publish(state);
-    VisualizeData(*coneArray);
 #endif
 
 }
 
 void LidarConeDetection::SetPublisher(ros::Publisher publisher) {
     m_publisher = publisher;
-}
-
-void LidarConeDetection::VisualizeData(const sgtdv_msgs::Point2DArr &point2DArr) {
-    visualization_msgs::MarkerArray markerArray;
-    for (int i = 0; i < point2DArr.points.size(); ++i) {
-        visualization_msgs::Marker marker;
-
-        marker.ns = "lidar_cone_visualize";
-        marker.id = i;
-        marker.type = visualization_msgs::Marker::CYLINDER;
-        marker.header.frame_id = "velodyne";
-        marker.header.stamp = ros::Time();
-
-        marker.pose.position.x = point2DArr.points[i].x;
-        marker.pose.position.y = point2DArr.points[i].y;
-
-        marker.scale.x = 0.2;
-        marker.scale.y = 0.2;
-        marker.scale.z = 0.2;
-
-        marker.color.r = 1;
-        marker.color.g = 0;
-        marker.color.b = 0;
-        marker.color.a = 1.0;
-
-        marker.lifetime = ros::Duration(0.1);
-
-        markerArray.markers.push_back(marker);
-    }
-    m_filteredPointsMarkerPublisher.publish(markerArray);
 }

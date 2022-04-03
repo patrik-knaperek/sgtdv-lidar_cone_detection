@@ -1,6 +1,6 @@
 /*****************************************************/
 //Organization: Stuba Green Team
-//Authors: Juraj Krasňanský
+//Authors: Juraj Krasňanský, Matej Dudák
 /*****************************************************/
 
 
@@ -45,22 +45,15 @@ public:
 
     void Do(const sensor_msgs::PointCloud2::ConstPtr &msg);
 
-    void VisualizeData(const sgtdv_msgs::Point2DArr &point2DArr);
-
-#ifdef DEBUG_STATE
-
+#ifdef SGT_DEBUG_STATE
     void SetVisDebugPublisher(ros::Publisher publisher) { m_visDebugPublisher = publisher; }
-
-    void SetFilteredPointsMarkerPublisher(ros::Publisher publisher) { m_filteredPointsMarkerPublisher = publisher; }
-
 #endif
 
 private:
     ros::Publisher m_publisher;
 
-#ifdef DEBUG_STATE
+#ifdef SGT_DEBUG_STATE
     ros::Publisher m_visDebugPublisher;
-    ros::Publisher m_filteredPointsMarkerPublisher;
 #endif
 
 };

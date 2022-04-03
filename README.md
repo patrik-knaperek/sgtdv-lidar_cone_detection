@@ -12,6 +12,4 @@
     * `catkin_make --only-pkg-with-deps velodyne lidar_cone_detection`
     * `roslaunch lidar_cone_detection lidar_cone_detection.launch`
 
-To see data from LIDAR as well as detected cones, make sure that **DEBUG_STATE** in _SGT_Macros.h_ is set to **1** and run :
-
-`rosrun rviz rviz -d src/lidar_cone_detection/lidar_cone_detection.rviz`
+To see data from LIDAR as well as detected cones, use `sensors_visualization` package.
