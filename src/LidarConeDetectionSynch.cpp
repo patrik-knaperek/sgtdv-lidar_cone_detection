@@ -23,11 +23,11 @@ void LidarConeDetectionSynch::ReceiveSignal(const std_msgs::Empty::ConstPtr &msg
 
 void LidarConeDetectionSynch::Do(const sensor_msgs::PointCloud2::ConstPtr &msg)
 {
-    if(m_signalReceived)
-    {
-        m_signalReceived = false;
+    //if(m_signalReceived)
+    //{
+        //m_signalReceived = false;
         m_lidarConeDetection.Do(msg);
-    }
+    //}
 }
 
 void LidarConeDetectionSynch::SetPublisher(ros::Publisher publisher)

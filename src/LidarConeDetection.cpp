@@ -95,6 +95,7 @@ void LidarConeDetection::Do(const sensor_msgs::PointCloud2::ConstPtr &msg) {
 #ifdef SGT_DEBUG_STATE
     state.numOfCones = coneArray->points.size();
     state.workingState = 0;
+	m_visDebugPublisher.publish(state);
 #endif
 
 }
