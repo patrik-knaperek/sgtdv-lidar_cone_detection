@@ -79,9 +79,13 @@ void LidarConeDetection::Do(const sensor_msgs::PointCloud2::ConstPtr &msg) {
             }
         }
 
+        int i_n = 0;
         for (int i = 0; i < pointSelected.size(); i++) {
             if (pointSelected[i]) {
                 sgtdv_msgs::Point2D point;
+                point.header.frame_id = "lidar";
+                point.header.seq = i_n++;
+                point.header.stamp = msg->header.stamp;
                 point.x = cloud_xyz->points[i].x;
                 point.y = cloud_xyz->points[i].y;
                 coneArray->points.push_back(point);
