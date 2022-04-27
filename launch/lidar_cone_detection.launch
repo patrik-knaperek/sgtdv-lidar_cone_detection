@@ -1,0 +1,7 @@
+<launch>
+  <include file="$(find velodyne_pointcloud)/launch/VLP16_points.launch"/>
+  <node pkg="lidar_cone_detection" type="lidar_cone_detection" name="lidarConeDetection"/>
+
+	<node pkg="tf2_ros" type="static_transform_publisher" name="velodyne_to_lidar" 
+    args="0 0 0 0 0 0 lidar velodyne" />
+</launch>

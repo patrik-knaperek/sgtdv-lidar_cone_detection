@@ -1,6 +1,6 @@
 /*****************************************************/
 //Organization: Stuba Green Team
-//Authors: Juraj Krasňanský
+//Authors: Juraj Krasňanský, Matej Dudák
 /*****************************************************/
 
 
@@ -20,7 +20,7 @@ public:
     void Do(const sensor_msgs::PointCloud2::ConstPtr &msg);
     void SetPublisher(ros::Publisher publisher);
 
-#ifdef DEBUG_STATE
+#ifdef SGT_DEBUG_STATE
     void SetVisDebugPublisher(ros::Publisher publisher) { m_lidarConeDetection.SetVisDebugPublisher(publisher); }
 #endif
 
