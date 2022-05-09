@@ -24,9 +24,7 @@ void LidarConeDetection::Do(const sensor_msgs::PointCloud2::ConstPtr &msg) {
     pcl::PCLPointCloud2ConstPtr cloudPtr(cloud);
 
     pcl_conversions::toPCL(*msg, *cloud);
-
     pcl::PassThrough<pcl::PCLPointCloud2> passThrough;
-    pcl::RadiusOutlierRemoval<pcl::PCLPointCloud2> radiusRemoval;
 
     passThrough.setInputCloud(cloudPtr);
     if (cloud->width > 0) {
@@ -55,51 +53,54 @@ void LidarConeDetection::Do(const sensor_msgs::PointCloud2::ConstPtr &msg) {
         passThrough.filter(*cloud);
     }
 
-    if (cloud->width > 0) {
-        //remove all data, that have less neighbour points than CONE_CLUSTER_NEIGHBOURS in within CONE_CLUSTER_RADIUS
-        radiusRemoval.setInputCloud(cloudPtr);
-        radiusRemoval.setRadiusSearch(CONE_CLUSTER_RADIUS);
-        radiusRemoval.setMinNeighborsInRadius(CONE_CLUSTER_NEIGHBOURS);
-        radiusRemoval.filter(*cloud);
-    }
-
-    //select only one point from points that are within 1m circle
     if (cloud->width > 2) {
-        pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_xyz(new pcl::PointCloud<pcl::PointXYZ>());
-        pcl::fromPCLPointCloud2(*cloud, *cloud_xyz);
+        /**
+         * https://pointclouds.org/documentation/classpcl_1_1_euclidean_cluster_extraction.html
+         * using Euclidean cluster extraction to get clusters of CONE_CLUSTER_POINTS within CONE_CLUSTER_RADIUS
+         *
+         * in for loop, closest point is selected from each cluster
+         */
+        pcl::PointCloud<pcl::PointXYZ>::Ptr cloudFiltered(new pcl::PointCloud<pcl::PointXYZ>);
+        pcl::fromPCLPointCloud2(*cloud, *cloudFiltered);
+        pcl::search::KdTree<pcl::PointXYZ>::Ptr tree(new pcl::search::KdTree<pcl::PointXYZ>);
+        std::vector<pcl::PointIndices> clusterIndices;
+        tree->setInputCloud(cloudFiltered);
+        pcl::EuclideanClusterExtraction<pcl::PointXYZ> ec;
+        ec.setClusterTolerance(CONE_CLUSTER_RADIUS);
+        ec.setMinClusterSize(CONE_CLUSTER_MIN_POINTS);
+        ec.setMaxClusterSize(CONE_CLUSTER_MAX_POINTS);
+        ec.setSearchMethod(tree);
+        ec.setInputCloud(cloudFiltered);
+        ec.extract(clusterIndices);
 
-        std::vector<bool> pointSelected(cloud_xyz->size(), false);
-        for (int i = 0; i < cloud_xyz->size(); i++) {
-            for (int j = i + 1; j < cloud_xyz->size(); j++) {
-                if (abs(cloud_xyz->points[i].x - cloud_xyz->points[j].x) < CONE_POINTS_RADIUS &&
-                    abs(cloud_xyz->points[i].y - cloud_xyz->points[j].y) < CONE_POINTS_RADIUS &&
-                    abs(cloud_xyz->points[i].z - cloud_xyz->points[j].z) < CONE_POINTS_RADIUS) {
-                    pointSelected[i] = true;
-                }
-            }
-        }
-
-        int i_n = 0;
-        for (int i = 0; i < pointSelected.size(); i++) {
-            if (pointSelected[i]) {
+        if (!clusterIndices.empty()) {
+            coneArray->points.reserve(clusterIndices.size());
+            int i_n = 0;
+            for (const auto &indices: clusterIndices) {
                 sgtdv_msgs::Point2D point;
-                point.header.frame_id = "lidar";
+                point.header.frame_id = "velodyne";
                 point.header.seq = i_n++;
                 point.header.stamp = msg->header.stamp;
-                point.x = cloud_xyz->points[i].x;
-                point.y = cloud_xyz->points[i].y;
+                float minDistance = std::numeric_limits<float>::max();
+                for (int i: indices.indices) {
+                    float distance = sqrt(pow(cloudFiltered->points[i].x, 2) + pow(cloudFiltered->points[i].y, 2));
+                    if (distance < minDistance) {
+                        minDistance = distance;
+                        point.x = cloudFiltered->points[i].x;
+                        point.y = cloudFiltered->points[i].y;
+                    }
+                }
                 coneArray->points.push_back(point);
             }
         }
     }
-    coneArray->points.reserve(cloud->width);
 
     m_publisher.publish(coneArray);
 
 #ifdef SGT_DEBUG_STATE
     state.numOfCones = coneArray->points.size();
     state.workingState = 0;
-	m_visDebugPublisher.publish(state);
+    m_visDebugPublisher.publish(state);
 #endif
 
 }
