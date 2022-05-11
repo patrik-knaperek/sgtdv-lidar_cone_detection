@@ -18,7 +18,8 @@
 
 #define CONE_CLUSTER_MIN_POINTS 3
 #define CONE_CLUSTER_MAX_POINTS 10
-#define CONE_CLUSTER_RADIUS 1 //1 meter
+#define CONE_CLUSTER_RADIUS 0.3 //30 cm
+#define CONE_RADIUS 0.11 // 11cm
 
 //values in centimeters
 #define CONE_INTENSITY_MIN 40

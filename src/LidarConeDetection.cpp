@@ -77,19 +77,23 @@ void LidarConeDetection::Do(const sensor_msgs::PointCloud2::ConstPtr &msg) {
             coneArray->points.reserve(clusterIndices.size());
             int i_n = 0;
             for (const auto &indices: clusterIndices) {
-                sgtdv_msgs::Point2D point;
-                point.header.frame_id = "velodyne";
-                point.header.seq = i_n++;
-                point.header.stamp = msg->header.stamp;
-                float minDistance = std::numeric_limits<float>::max();
+                double x, y;
+                double minDistance = std::numeric_limits<double>::max();
                 for (int i: indices.indices) {
-                    float distance = sqrt(pow(cloudFiltered->points[i].x, 2) + pow(cloudFiltered->points[i].y, 2));
+                    double distance = sqrt(pow(cloudFiltered->points[i].x, 2) + pow(cloudFiltered->points[i].y, 2) + pow(cloudFiltered->points[i].z, 2) );
                     if (distance < minDistance) {
                         minDistance = distance;
-                        point.x = cloudFiltered->points[i].x;
-                        point.y = cloudFiltered->points[i].y;
+                        x = cloudFiltered->points[i].x;
+                        y = cloudFiltered->points[i].y;
                     }
                 }
+                double alpha = atan(y / x);
+                sgtdv_msgs::Point2D point;
+                point.x = x + cos(alpha) * CONE_RADIUS;
+                point.y = y + sin(alpha) * CONE_RADIUS;
+                point.header.frame_id = "lidar";
+                point.header.seq = i_n++;
+                point.header.stamp = msg->header.stamp;
                 coneArray->points.push_back(point);
             }
         }
