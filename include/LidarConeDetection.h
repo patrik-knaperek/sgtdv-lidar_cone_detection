@@ -17,7 +17,7 @@
 #include <pcl/segmentation/extract_clusters.h>
 
 #define CONE_CLUSTER_MIN_POINTS 3
-#define CONE_CLUSTER_MAX_POINTS 10
+#define CONE_CLUSTER_MAX_POINTS 500
 #define CONE_CLUSTER_RADIUS 0.3 //30 cm
 #define CONE_RADIUS 0.11 // 11cm
 
@@ -28,7 +28,7 @@
 #define CONE_X_MAX 30
 #define CONE_Y_MIN -20
 #define CONE_Y_MAX 20
-#define CONE_Z_MIN 0.1
+#define CONE_Z_MIN 0.01
 #define CONE_Z_MAX 0.3
 
 
