@@ -5,34 +5,31 @@
 
 
 #include <ros/ros.h>
+#include<cmath>
 #include <vector>
 #include <sgtdv_msgs/Point2DArr.h>
-#include <std_msgs/Empty.h>
 #include <sensor_msgs/PointCloud2.h>
-#include <visualization_msgs/MarkerArray.h>
-#include <visualization_msgs/Marker.h>
 #include "../../SGT_Macros.h"
 #include <sgtdv_msgs/DebugState.h>
 #include <pcl_ros/point_cloud.h>
 #include <pcl_conversions/pcl_conversions.h>
 #include <pcl/filters/passthrough.h>
-#include <pcl/filters/radius_outlier_removal.h>
+#include <pcl/segmentation/extract_clusters.h>
 
-//values for pcl constants are in centimeters
-//constants for KNN clustering
-#define CONE_CLUSTER_NEIGHBOURS 3
-#define CONE_CLUSTER_RADIUS 0.2
+#define CONE_CLUSTER_MIN_POINTS 3
+#define CONE_CLUSTER_MAX_POINTS 500
+#define CONE_CLUSTER_RADIUS 0.3 //30 cm
+#define CONE_RADIUS 0.11 // 11cm
+
+//values in centimeters
 #define CONE_INTENSITY_MIN 40
 #define CONE_INTENSITY_MAX 250
 #define CONE_X_MIN 0.75
 #define CONE_X_MAX 30
 #define CONE_Y_MIN -20
 #define CONE_Y_MAX 20
-#define CONE_Z_MIN 0.1
+#define CONE_Z_MIN 0.01
 #define CONE_Z_MAX 0.3
-
-//radius in meters from which 1 point will be selected from filtere data, representing cone
-#define CONE_POINTS_RADIUS 1
 
 
 class LidarConeDetection {
