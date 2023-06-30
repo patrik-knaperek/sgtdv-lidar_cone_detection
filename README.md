@@ -1,4 +1,4 @@
-# **LidarConeDetection**
+# **LidarConeDetection package**
 
 ___
 
