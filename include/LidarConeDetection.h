@@ -7,7 +7,7 @@
 #include <ros/ros.h>
 #include<cmath>
 #include <vector>
-#include <sgtdv_msgs/Point2DArr.h>
+#include <sgtdv_msgs/Point2DStampedArr.h>
 #include <sensor_msgs/PointCloud2.h>
 #include "../../SGT_Macros.h"
 #include <sgtdv_msgs/DebugState.h>

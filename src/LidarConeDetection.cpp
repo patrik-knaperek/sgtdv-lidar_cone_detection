@@ -19,7 +19,7 @@ void LidarConeDetection::Do(const sensor_msgs::PointCloud2::ConstPtr &msg) {
     m_visDebugPublisher.publish(state);
 #endif
 
-    sgtdv_msgs::Point2DArrPtr coneArray(new sgtdv_msgs::Point2DArr);
+    sgtdv_msgs::Point2DStampedArrPtr coneArray(new sgtdv_msgs::Point2DStampedArr);
     pcl::PCLPointCloud2 *cloud = new pcl::PCLPointCloud2;
     pcl::PCLPointCloud2ConstPtr cloudPtr(cloud);
 
@@ -88,7 +88,7 @@ void LidarConeDetection::Do(const sensor_msgs::PointCloud2::ConstPtr &msg) {
                     }
                 }
                 double alpha = atan(y / x);
-                sgtdv_msgs::Point2D point;
+                sgtdv_msgs::Point2DStamped point;
                 point.x = x + cos(alpha) * CONE_RADIUS;
                 point.y = y + sin(alpha) * CONE_RADIUS;
                 point.header.frame_id = "lidar";
