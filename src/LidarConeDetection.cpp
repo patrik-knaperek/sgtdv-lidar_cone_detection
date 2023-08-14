@@ -19,13 +19,17 @@ void LidarConeDetection::Do(const sensor_msgs::PointCloud2::ConstPtr &msg) {
     m_visDebugPublisher.publish(state);
 #endif
 
-    sgtdv_msgs::Point2DStampedArrPtr coneArray(new sgtdv_msgs::Point2DStampedArr);
+    // auto time = std::chrono::steady_clock::now();
+    
+    sgtdv_msgs::Point2DStampedArr coneArray;
     pcl::PCLPointCloud2 *cloud = new pcl::PCLPointCloud2;
     pcl::PCLPointCloud2ConstPtr cloudPtr(cloud);
 
     pcl_conversions::toPCL(*msg, *cloud);
     pcl::PassThrough<pcl::PCLPointCloud2> passThrough;
-
+    
+    // ROS_INFO_STREAM("init time: " << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()-time).count());
+    // time = std::chrono::steady_clock::now();
     passThrough.setInputCloud(cloudPtr);
     if (cloud->width > 0) {
         //filter data by intensity
@@ -53,6 +57,9 @@ void LidarConeDetection::Do(const sensor_msgs::PointCloud2::ConstPtr &msg) {
         passThrough.filter(*cloud);
     }*/
 
+    // ROS_INFO_STREAM("filter time: " << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()-time).count());
+    // time = std::chrono::steady_clock::now();
+
     if (cloud->width > 2) {
         /**
          * https://pointclouds.org/documentation/classpcl_1_1_euclidean_cluster_extraction.html
@@ -73,31 +80,37 @@ void LidarConeDetection::Do(const sensor_msgs::PointCloud2::ConstPtr &msg) {
         ec.setInputCloud(cloudFiltered);
         ec.extract(clusterIndices);
 
+        // ROS_INFO_STREAM("clustering time: " << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()-time).count());
+        // time = std::chrono::steady_clock::now();
+
         if (!clusterIndices.empty()) {
-            coneArray->points.reserve(clusterIndices.size());
+            coneArray.points.reserve(clusterIndices.size());
+            double x, y, distance;
             int i_n = 0;
             for (const auto &indices: clusterIndices) {
-                double x, y;
                 double minDistance = std::numeric_limits<double>::max();
                 for (int i: indices.indices) {
-                    double distance = sqrt(pow(cloudFiltered->points[i].x, 2) + pow(cloudFiltered->points[i].y, 2) + pow(cloudFiltered->points[i].z, 2) );
+                    distance = sqrt(pow(cloudFiltered->points[i].x, 2) + pow(cloudFiltered->points[i].y, 2) + pow(cloudFiltered->points[i].z, 2) );
                     if (distance < minDistance) {
                         minDistance = distance;
                         x = cloudFiltered->points[i].x;
                         y = cloudFiltered->points[i].y;
                     }
                 }
-                double alpha = atan(y / x);
+                const double alpha = atan(y / x);
                 sgtdv_msgs::Point2DStamped point;
                 point.x = x + cos(alpha) * CONE_RADIUS;
                 point.y = y + sin(alpha) * CONE_RADIUS;
                 point.header.frame_id = "lidar";
                 point.header.seq = i_n++;
                 point.header.stamp = msg->header.stamp;
-                coneArray->points.push_back(point);
+                coneArray.points.emplace_back(point);
             }
         }
     }
+
+    // ROS_INFO_STREAM("detection time: " << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()-time).count());
+    // time = std::chrono::steady_clock::now();
 
     m_publisher.publish(coneArray);
 
