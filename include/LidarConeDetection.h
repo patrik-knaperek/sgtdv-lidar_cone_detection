@@ -29,7 +29,7 @@
 #define CONE_X_MAX 30
 #define CONE_Y_MIN (-10)
 #define CONE_Y_MAX 10
-#define CONE_Z_MIN 0.01
+#define CONE_Z_MIN 0.0
 #define CONE_Z_MAX 0.3
 
 

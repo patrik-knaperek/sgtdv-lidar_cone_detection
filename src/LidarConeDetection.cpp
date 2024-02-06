@@ -50,12 +50,12 @@ void LidarConeDetection::Do(const sensor_msgs::PointCloud2::ConstPtr &msg) {
         passThrough.filter(*cloud);
     }
 
-    /*if (cloud->width > 0) {
+    if (cloud->width > 0) {
         //filter data by z axis (vertical distance from lidar sensor)
         passThrough.setFilterFieldName("z");
         passThrough.setFilterLimits(CONE_Z_MIN, CONE_Z_MAX);
         passThrough.filter(*cloud);
-    }*/
+    }
 
     // ROS_INFO_STREAM("filter time: " << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()-time).count());
     // time = std::chrono::steady_clock::now();
