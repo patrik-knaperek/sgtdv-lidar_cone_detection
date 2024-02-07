@@ -15,6 +15,7 @@ LidarConeDetection::~LidarConeDetection() {
 void LidarConeDetection::Do(const sensor_msgs::PointCloud2::ConstPtr &msg) {
 #ifdef SGT_DEBUG_STATE
     sgtdv_msgs::DebugState state;
+    state.stamp = ros::Time::now();
     state.workingState = 1;
     m_visDebugPublisher.publish(state);
 #endif
@@ -198,6 +199,7 @@ void LidarConeDetection::Do(const sensor_msgs::PointCloud2::ConstPtr &msg) {
 
 #ifdef SGT_DEBUG_STATE
     state.numOfCones = coneArray.points.size();
+    state.stamp = ros::Time::now();
     state.workingState = 0;
     m_visDebugPublisher.publish(state);
 #endif
