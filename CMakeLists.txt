@@ -30,7 +30,7 @@ include_directories(
         ${catkin_INCLUDE_DIRS}
 )
 
-add_executable(${PROJECT_NAME} src/LidarConeDetectionNODE.cpp src/LidarConeDetection.cpp src/LidarConeDetectionSynch.cpp)
+add_executable(${PROJECT_NAME} src/lidar_cone_detection_node.cpp src/lidar_cone_detection.cpp src/lidar_cone_detection_synch.cpp)
 
 target_link_libraries(lidar_cone_detection
         ${catkin_LIBRARIES}

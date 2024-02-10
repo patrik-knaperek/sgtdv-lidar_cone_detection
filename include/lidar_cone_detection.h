@@ -1,20 +1,26 @@
 /*****************************************************/
-//Organization: Stuba Green Team
-//Authors: Juraj Krasňanský, Matej Dudák, Lukáš Lánik
+/* Organization: Stuba Green Team
+/* Authors: Juraj Krasňanský, Matej Dudák, Lukáš Lánik
 /*****************************************************/
 
+# pragma once
 
-#include <ros/ros.h>
+/* C++ */
 #include <cmath>
 #include <vector>
-#include <sgtdv_msgs/Point2DStampedArr.h>
+
+/* ROS */
+#include <ros/ros.h>
 #include <sensor_msgs/PointCloud2.h>
-#include "../../SGT_Macros.h"
-#include <sgtdv_msgs/DebugState.h>
 #include <pcl_ros/point_cloud.h>
 #include <pcl_conversions/pcl_conversions.h>
 #include <pcl/filters/passthrough.h>
 #include <pcl/segmentation/extract_clusters.h>
+
+/* SGT */
+#include <sgtdv_msgs/Point2DStampedArr.h>
+#include "../../SGT_Macros.h"
+#include <sgtdv_msgs/DebugState.h>
 
 //values are in meters
 #define CONE_CLUSTER_MIN_POINTS 3
@@ -41,21 +47,21 @@ public:
 
     void SetPublisher(ros::Publisher publisher);
 
-    void Do(const sensor_msgs::PointCloud2::ConstPtr &msg);
+    void lidarCallback(const sensor_msgs::PointCloud2::ConstPtr &msg) const;
 
 	// Eigen::Vector3f deltaVec(pcl::PointIndices indices, pcl::PointCloud<pcl::PointXYZ>::Ptr cloudFiltered, Eigen::Vector3f coneCenter);
 
 #ifdef SGT_DEBUG_STATE
-    void SetVisDebugPublisher(ros::Publisher publisher) { m_visDebugPublisher = publisher; }
+    void SetVisDebugPublisher(ros::Publisher publisher) { vis_debug_publisher_ = publisher; }
 #endif
 
 private:
-    ros::Publisher m_publisher;
+    ros::Publisher publisher_;
 
 	
 
 #ifdef SGT_DEBUG_STATE
-    ros::Publisher m_visDebugPublisher;
+    ros::Publisher vis_debug_publisher_;
 #endif
 
 };

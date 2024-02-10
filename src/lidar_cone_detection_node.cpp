@@ -1,16 +1,10 @@
 /*****************************************************/
-//Organization: Stuba Green Team
-//Authors: Juraj Krasňanský, Matej Dudák
+/* Organization: Stuba Green Team
+/* Authors: Juraj Krasňanský, Matej Dudák
 /*****************************************************/
 
 
-#include <ros/ros.h>
-#include "../include/LidarConeDetectionSynch.h"
-#include "../../SGT_Macros.h"
-#include <sgtdv_msgs/DebugState.h>
-#include <std_msgs/Empty.h>
-#include <sgtdv_msgs/Point2DStampedArr.h>
-#include <sensor_msgs/PointCloud2.h>
+#include "../include/lidar_cone_detection_synch.h"
 
 int main(int argc, char **argv) {
     LidarConeDetectionSynch synchObj;

@@ -5,7 +5,7 @@
 
 
 #include <ros/ros.h>
-#include "LidarConeDetection.h"
+#include "lidar_cone_detection.h"
 #include <std_msgs/Empty.h>
 #include <sensor_msgs/PointCloud2.h>
 #include "../../SGT_Macros.h"

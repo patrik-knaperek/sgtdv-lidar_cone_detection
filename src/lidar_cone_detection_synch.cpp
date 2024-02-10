@@ -4,7 +4,7 @@
 /*****************************************************/
 
 
-#include "../include/LidarConeDetectionSynch.h"
+#include "../include/lidar_cone_detection_synch.h"
 
 LidarConeDetectionSynch::LidarConeDetectionSynch()
 {
@@ -26,7 +26,7 @@ void LidarConeDetectionSynch::Do(const sensor_msgs::PointCloud2::ConstPtr &msg)
     //if(m_signalReceived)
     //{
         //m_signalReceived = false;
-        m_lidarConeDetection.Do(msg);
+        m_lidarConeDetection.lidarCallback(msg);
     //}
 }
 
