@@ -16,6 +16,8 @@ find_package(catkin REQUIRED COMPONENTS
   pcl_ros
 )
 
+find_package(Eigen3 REQUIRED)
+
 catkin_package(
   CATKIN_DEPENDS roscpp
   CATKIN_DEPENDS std_msgs
@@ -27,6 +29,7 @@ catkin_package(
 
 include_directories(
   ${catkin_INCLUDE_DIRS}
+  ${EIGEN3_INCLUDE_DIRS}
 )
 
 add_executable(${PROJECT_NAME} src/lidar_cone_detection_node.cpp src/lidar_cone_detection.cpp)

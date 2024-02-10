@@ -1,4 +1,6 @@
 <launch>
+  <rosparam command="load" file="$(find lidar_cone_detection)/params/lidar_cone_detection.yaml"/>
+
   <include file="$(find velodyne_pointcloud)/launch/VLP16_points.launch"/>
   <node pkg="lidar_cone_detection" type="lidar_cone_detection" name="lidarConeDetection" output="screen"/>
 

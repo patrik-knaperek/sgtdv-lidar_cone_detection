@@ -20,24 +20,8 @@
 /* SGT */
 #include <sgtdv_msgs/Point2DStampedArr.h>
 #include "../../SGT_Macros.h"
+#include "../../SGT_Utils.h"
 #include <sgtdv_msgs/DebugState.h>
-
-//values are in meters
-#define CONE_CLUSTER_MIN_POINTS 3
-#define CONE_CLUSTER_MAX_POINTS 500
-#define CONE_CLUSTER_RADIUS 0.3 //30 cm
-#define CONE_RADIUS 0.11 // 11cm
-#define EPSILON_ERROR 0.01 // 1cm
-
-#define CONE_INTENSITY_MIN 40
-#define CONE_INTENSITY_MAX 250
-#define CONE_X_MIN 0.75
-#define CONE_X_MAX 30
-#define CONE_Y_MIN (-10)
-#define CONE_Y_MAX 10
-#define CONE_Z_MIN 0.0
-#define CONE_Z_MAX 0.3
-
 
 class LidarConeDetection
 {
@@ -48,10 +32,22 @@ public:
 
   void lidarCallback(const sensor_msgs::PointCloud2::ConstPtr &msg) const;
 
+  struct Params
+  {
+    Utils::Range<double> cluster_points;
+    Utils::Range<double> intensity;
+    Utils::Range<double> x_range;
+    Utils::Range<double> y_range;
+    Utils::Range<double> z_range;
+    double cluster_radius;
+    double mean_cone_radius;
+  };
+
 private:
   ros::Publisher publisher_;
   ros::Subscriber pcl_sub_;
 	
+  Params params_;
 
 #ifdef SGT_DEBUG_STATE
   ros::Publisher vis_debug_publisher_;

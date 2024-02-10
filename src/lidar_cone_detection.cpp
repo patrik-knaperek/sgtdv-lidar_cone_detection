@@ -13,6 +13,19 @@ LidarConeDetection::LidarConeDetection(ros::NodeHandle& nh) :
 , vis_debug_publisher_(nh.advertise<sgtdv_msgs::DebugState>("lidar_cone_detection_debug_state", 2))
 #endif
 {
+  /* Load ROS parameters from server */
+  Utils::loadParam(nh, "pcl_filter/x/min", &params_.x_range.min);
+  Utils::loadParam(nh, "pcl_filter/x/max", &params_.x_range.max);
+  Utils::loadParam(nh, "pcl_filter/y/min", &params_.y_range.min);
+  Utils::loadParam(nh, "pcl_filter/y/max", &params_.y_range.max);
+  Utils::loadParam(nh, "pcl_filter/z/min", &params_.z_range.min);
+  Utils::loadParam(nh, "pcl_filter/z/max", &params_.z_range.max);
+  Utils::loadParam(nh, "pcl_cluster/n_points/min", &params_.cluster_points.min);
+  Utils::loadParam(nh, "pcl_cluster/n_points/max", &params_.cluster_points.max);
+  Utils::loadParam(nh, "pcl_filter/intensity/min", &params_.intensity.min);
+  Utils::loadParam(nh, "pcl_filter/intensity/max", &params_.intensity.max);
+  Utils::loadParam(nh, "pcl_cluster/radius", &params_.cluster_radius);
+  Utils::loadParam(nh, "mean_cone_radius", &params_.mean_cone_radius);
 }
 
 void LidarConeDetection::lidarCallback(const sensor_msgs::PointCloud2::ConstPtr &msg) const
@@ -39,21 +52,21 @@ void LidarConeDetection::lidarCallback(const sensor_msgs::PointCloud2::ConstPtr 
   {
     //filter data by intensity
     pass_through.setFilterFieldName("intensity");
-    pass_through.setFilterLimits(CONE_INTENSITY_MIN, CONE_INTENSITY_MAX);
+    pass_through.setFilterLimits(params_.intensity.min, params_.intensity.max);
     pass_through.filter(*cloud);
   }
   if(cloud->width > 0)
   {
     //filter data by X axis (forward distance from lidar sensor)
     pass_through.setFilterFieldName("x");
-    pass_through.setFilterLimits(CONE_X_MIN, CONE_X_MAX);
+    pass_through.setFilterLimits(params_.x_range.min, params_.x_range.max);
     pass_through.filter(*cloud);
   }
   if(cloud->width > 0)
   {
     //filter data by y axis (side distance from lidar sensor)
     pass_through.setFilterFieldName("y");
-    pass_through.setFilterLimits(CONE_Y_MIN, CONE_Y_MAX);
+    pass_through.setFilterLimits(params_.y_range.min, params_.y_range.max);
     pass_through.filter(*cloud);
   }
 
@@ -61,7 +74,7 @@ void LidarConeDetection::lidarCallback(const sensor_msgs::PointCloud2::ConstPtr 
   {
     //filter data by z axis (vertical distance from lidar sensor)
     pass_through.setFilterFieldName("z");
-    pass_through.setFilterLimits(CONE_Z_MIN, CONE_Z_MAX);
+    pass_through.setFilterLimits(params_.z_range.min, params_.z_range.max);
     pass_through.filter(*cloud);
   }
 
@@ -78,9 +91,9 @@ void LidarConeDetection::lidarCallback(const sensor_msgs::PointCloud2::ConstPtr 
     std::vector<pcl::PointIndices> cluster_indices;
     tree->setInputCloud(cloud_filtered);
     pcl::EuclideanClusterExtraction<pcl::PointXYZ> ec;
-    ec.setClusterTolerance(CONE_CLUSTER_RADIUS);
-    ec.setMinClusterSize(CONE_CLUSTER_MIN_POINTS);
-    ec.setMaxClusterSize(CONE_CLUSTER_MAX_POINTS);
+    ec.setClusterTolerance(params_.cluster_radius);
+    ec.setMinClusterSize(params_.cluster_points.min);
+    ec.setMaxClusterSize(params_.cluster_points.max);
     ec.setSearchMethod(tree);
     ec.setInputCloud(cloud_filtered);
     ec.extract(cluster_indices);
@@ -109,7 +122,7 @@ void LidarConeDetection::lidarCallback(const sensor_msgs::PointCloud2::ConstPtr 
         centroid_pos.x /= indices.indices.size();
         centroid_pos.y /= indices.indices.size();
         const double centroid_pos_abs = sqrt(pow(centroid_pos.x, 2) + pow(centroid_pos.y, 2));
-        const double scale_factor = 1 + 2 * CONE_RADIUS / (M_PI * centroid_pos_abs);
+        const double scale_factor = 1 + 2 * params_.mean_cone_radius / (M_PI * centroid_pos_abs);
         
         sgtdv_msgs::Point2DStamped point;
         point.x = centroid_pos.x * scale_factor;
