@@ -3,13 +3,16 @@
 /* Authors: Juraj Krasňanský, Matej Dudák, Lukáš Lánik
 /*****************************************************/
 
-
 #include "../include/lidar_cone_detection.h"
 
-LidarConeDetection::LidarConeDetection() {
-}
-
-LidarConeDetection::~LidarConeDetection() {
+LidarConeDetection::LidarConeDetection(ros::NodeHandle& nh) :
+    /* ROS interface init */
+    publisher_(nh.advertise<sgtdv_msgs::Point2DStampedArr>("lidar_cones", 1)),
+    pcl_sub_(nh.subscribe("velodyne_points", 1, &LidarConeDetection::lidarCallback, this))
+#ifdef SGT_DEBUG_STATE
+    , vis_debug_publisher_(nh.advertise<sgtdv_msgs::DebugState>("lidar_cone_detection_debug_state", 2))
+#endif
+{
 }
 
 void LidarConeDetection::lidarCallback(const sensor_msgs::PointCloud2::ConstPtr &msg) const{
@@ -20,9 +23,9 @@ void LidarConeDetection::lidarCallback(const sensor_msgs::PointCloud2::ConstPtr 
     vis_debug_publisher_.publish(state);
 #endif
 
-    // auto time = std::chrono::steady_clock::now();
-    
     sgtdv_msgs::Point2DStampedArr cone_array;
+    
+    /* Pointcloud filtering */
     
     pcl::PCLPointCloud2 *cloud = new pcl::PCLPointCloud2;
     pcl::PCLPointCloud2ConstPtr cloud_ptr(cloud);
@@ -30,8 +33,6 @@ void LidarConeDetection::lidarCallback(const sensor_msgs::PointCloud2::ConstPtr 
     pcl_conversions::toPCL(*msg, *cloud);
     pcl::PassThrough<pcl::PCLPointCloud2> pass_through;
     
-    // ROS_INFO_STREAM("init time: " << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()-time).count());
-    // time = std::chrono::steady_clock::now();
     pass_through.setInputCloud(cloud_ptr);
     if (cloud->width > 0) {
         //filter data by intensity
@@ -59,11 +60,9 @@ void LidarConeDetection::lidarCallback(const sensor_msgs::PointCloud2::ConstPtr 
         pass_through.filter(*cloud);
     }
 
-    // ROS_INFO_STREAM("filter time: " << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()-time).count());
-    // time = std::chrono::steady_clock::now();
-
     if (cloud->width > 2) {
         /**
+         * Pointcloud clustering
          * https://pointclouds.org/documentation/classpcl_1_1_euclidean_cluster_extraction.html
          * using Euclidean cluster extraction to get clusters of CONE_CLUSTER_POINTS within CONE_CLUSTER_RADIUS
          */
@@ -80,66 +79,9 @@ void LidarConeDetection::lidarCallback(const sensor_msgs::PointCloud2::ConstPtr 
         ec.setInputCloud(cloud_filtered);
         ec.extract(cluster_indices);
 
-        /**
-         * The closest point is selected from each cluster, mean cone radius is added to its bearing vector to 
-         * compute center of the cone.
-         */
-        /*if (!clusterIndices.empty()) {
-            coneArray.points.reserve(clusterIndices.size());
-            int i_n = 0;
-            for (const auto &indices: clusterIndices) {
-                float x, y;
-                float minDistance = std::numeric_limits<float>::max();
-                for (int i: indices.indices) {
-                    float distance = sqrt(pow(cloudFiltered->points[i].x, 2) + pow(cloudFiltered->points[i].y, 2) + pow(cloudFiltered->points[i].z, 2));
-                    if (distance < minDistance) {
-                        minDistance = distance;
-                        x = cloudFiltered->points[i].x;
-                        y = cloudFiltered->points[i].y;
-                    }
-                }
-                const double alpha = atan(y / x);
-                sgtdv_msgs::Point2DStamped point;
-                point.x = x + cos(alpha) * CONE_RADIUS;
-                point.y = y + sin(alpha) * CONE_RADIUS;
-                point.header.frame_id = "lidar";
-                point.header.seq = i_n++;
-                point.header.stamp = msg->header.stamp;
-                coneArray.points.emplace_back(point);
-            }
-        }*/
-
-        /**
-         * X -> select point with minimal y and take x from it
-         * Y -> select point with minimal x and take y from it
-         */
-        /*
-        if (!clusterIndices.empty()) {
-            coneArray.points.reserve(clusterIndices.size());
-            int i_n = 0;
-            for (const auto &indices: clusterIndices) {
-                float yMin = std::numeric_limits<float>::max();
-                float xMin = std::numeric_limits<float>::max();
-                sgtdv_msgs::Point2DStamped point;
-                for (int i: indices.indices) {
-                    if (yMin > cloudFiltered->points[i].y) {
-                        yMin = cloudFiltered->points[i].y;
-                        point.x = cloudFiltered->points[i].x;
-                    }
-                    if (xMin > cloudFiltered->points[i].x) {
-                        xMin = cloudFiltered->points[i].x;
-                        point.y = cloudFiltered->points[i].y;
-                    }
-                }
-                point.header.frame_id = "lidar";
-                point.header.seq = i_n++;
-                point.header.stamp = msg->header.stamp;
-                coneArray.points.push_back(point);
-            }
-        }*/
-
 		/**
-		 * Approximate centroid of visible semicricular arc of cone by taking average
+		 * Cone detection
+         * Approximate centroid of visible semicricular arc of cone by taking average
 		 * over all points in point cluser then scale the position vector of the centroid
 		 * to get the approximate position of cone center
 		 */
@@ -166,35 +108,7 @@ void LidarConeDetection::lidarCallback(const sensor_msgs::PointCloud2::ConstPtr 
                 cone_array.points.push_back(point);
     		}
 		}
-
-		/**
-		 * Circular regression
-		 */
-        /*if (!clusterIndices.empty()) {
-			coneArray.points.reserve(clusterIndices.size());
-			int i_n = 0;
-			for (const auto &indices: clusterIndices) {
-				Eigen::Vector3f coneCenter(cloudFiltered->points[indices.indices.front()].x, cloudFiltered->points[indices.indices.front()].y, CONE_RADIUS);
-				Eigen::Vector3f delta = deltaVec(indices, cloudFiltered, coneCenter);
-
-				while (delta.norm() > EPSILON_ERROR) {
-					coneCenter -= delta;
-					delta = deltaVec(indices, cloudFiltered, coneCenter);
-				}
-				
-				sgtdv_msgs::Point2DStamped point;
-				point.x = coneCenter.x();
-				point.y = coneCenter.y();
-				point.header.frame_id = "lidar";
-				point.header.seq = i_n++;
-				point.header.stamp = msg->header.stamp;
-				coneArray.points.push_back(point);
-			}
-		}*/
 	}
-
-    // ROS_INFO_STREAM("detection time: " << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()-time).count());
-    // time = std::chrono::steady_clock::now();
 
     publisher_.publish(cone_array);
 
@@ -205,31 +119,3 @@ void LidarConeDetection::lidarCallback(const sensor_msgs::PointCloud2::ConstPtr 
     vis_debug_publisher_.publish(state);
 #endif
 }
-
-/*Eigen::Vector3f LidarConeDetection::deltaVec(pcl::PointIndices indices, pcl::PointCloud<pcl::PointXYZ>::Ptr cloudFiltered, Eigen::Vector3f coneCenter) {
-	int clusterSize = indices.indices.size();
-	Eigen::VectorXf residual(clusterSize);
-	Eigen::MatrixXf jaccobian(clusterSize, 3);
-	Eigen::Vector3f delta;
-	int j = 0;
-
-	for (int i: indices.indices) {
-		pcl::PointXYZ point = cloudFiltered->points[i];
-		float xDiff = point.x - coneCenter.x();
-		float yDiff = point.y - coneCenter.y();
-		double rootDist = sqrt(pow(xDiff, 2) + pow(yDiff, 2));
-		residual(j) = rootDist - CONE_RADIUS;
-		jaccobian(j, 0) = -xDiff / rootDist;
-		jaccobian(j, 1) = -yDiff / rootDist;
-		jaccobian(j, 2) = -1.0;
-		j++;
-	}
-
-	delta = (jaccobian.transpose() * jaccobian).inverse() * jaccobian.transpose() * residual;
-	return delta;
-}*/
-
-void LidarConeDetection::SetPublisher(ros::Publisher publisher) {
-    publisher_ = publisher;
-}
-

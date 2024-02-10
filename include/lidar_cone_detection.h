@@ -41,23 +41,15 @@
 
 class LidarConeDetection {
 public:
-    LidarConeDetection();
+    LidarConeDetection(ros::NodeHandle& nh);
 
-    ~LidarConeDetection();
-
-    void SetPublisher(ros::Publisher publisher);
+    ~LidarConeDetection() = default;
 
     void lidarCallback(const sensor_msgs::PointCloud2::ConstPtr &msg) const;
 
-	// Eigen::Vector3f deltaVec(pcl::PointIndices indices, pcl::PointCloud<pcl::PointXYZ>::Ptr cloudFiltered, Eigen::Vector3f coneCenter);
-
-#ifdef SGT_DEBUG_STATE
-    void SetVisDebugPublisher(ros::Publisher publisher) { vis_debug_publisher_ = publisher; }
-#endif
-
 private:
     ros::Publisher publisher_;
-
+    ros::Subscriber pcl_sub_;
 	
 
 #ifdef SGT_DEBUG_STATE
