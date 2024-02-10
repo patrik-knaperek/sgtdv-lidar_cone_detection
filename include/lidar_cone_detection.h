@@ -39,21 +39,21 @@
 #define CONE_Z_MAX 0.3
 
 
-class LidarConeDetection {
+class LidarConeDetection
+{
 public:
-    LidarConeDetection(ros::NodeHandle& nh);
+  LidarConeDetection(ros::NodeHandle& nh);
 
-    ~LidarConeDetection() = default;
+  ~LidarConeDetection() = default;
 
-    void lidarCallback(const sensor_msgs::PointCloud2::ConstPtr &msg) const;
+  void lidarCallback(const sensor_msgs::PointCloud2::ConstPtr &msg) const;
 
 private:
-    ros::Publisher publisher_;
-    ros::Subscriber pcl_sub_;
+  ros::Publisher publisher_;
+  ros::Subscriber pcl_sub_;
 	
 
 #ifdef SGT_DEBUG_STATE
-    ros::Publisher vis_debug_publisher_;
+  ros::Publisher vis_debug_publisher_;
 #endif
-
 };
