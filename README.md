@@ -4,7 +4,7 @@ ___
 
 &copy; **SGT Driverless**
 
-**Authors:** Juraj Krasňanský, Matej Dudák
+**Authors:** Juraj Krasňanský, Matej Dudák, Lukáš Lánik
 
 **Objective:** Cone detection and position estimation from Velodyne lidar.
 
@@ -12,11 +12,11 @@ ___
 
 `lidarConeDetection` node processes pointcloud data from `velodyne_driver` into estimated cone positions.  
 It works in 3 steps:
-- pointcloud filtering by intensity and carthesian coordinates
-- pointcloud euclidean clustering (based of euclidian distance of points)
-- cone center estimation (centroid approxiamtion based on average position vector of points in the cluster and mean cone radius)
+- pointcloud filtering by intensity and Cartesian coordinates
+- pointcloud euclidean clustering (based of euclidean distance of points)
+- cone center estimation (centroid approximation based on average position vector of points in the cluster and mean cone radius)
 
-**Note**: This version of algorithm cannot distinguist a cone from any other type of object
+**Note**: This version of algorithm cannot distinguish a cone from any other type of object
 
 ### Related packages
 * `velodyne`
@@ -48,8 +48,18 @@ In folder `ros_implementation/src/` run:
 ## Launch
 ```sh
     $ source ${SGT_ROOT}/ros_implementation/devel/setup.bash
-    $ roslaunch lidar_cone_detection lidar_cone_detection.launch
+    $ roslaunch <name_of_package> <name_of_lanchfile>
 ```
+Available launchfiles:
+* `lidar_cone_detection` package
+  * [`lidar_cone_detection.launch`](./launch/lidar_cone_detection.launch) : standalone with real sensor
+  * [`lidar_cone_detection_offline.launch`](./launch/lidar_cone_detection_offline.launch) : standalone with rosbag data
+      - In another terminal, `cd` to directory containing desired rosbags, then run `$ rosbag play -l <rosbag_name>`
+* `fusion` package
+  * [`fusion_rc.launch`](../fusion/launch/fusion_rc.launch) : along with `camera_driver` and `fusion` nodes (requires them to be built first)
+* `master` package
+  * [`rc.launch`](../master/launch/rc.launch) : along with complete pipeline
+
 ### Configuration
  * [`lidar_cone_detection.yaml`](./params/lidar_cone_detection.yaml):
     - `pcl_cluster/n_points/min` : minimal number of points in cluster extracted from pointcloud

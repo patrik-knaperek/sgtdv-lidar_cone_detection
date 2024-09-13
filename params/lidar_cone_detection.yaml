@@ -6,7 +6,7 @@ pcl_filter:
     min: -10
     max: 10
   z:
-    min: 0.0
+    min: -0.5
     max: 0.3
   intensity:
     min: 40
