@@ -1,0 +1,21 @@
+pcl_filter:
+  x:
+    min: 0.75
+    max: 30
+  y:
+    min: -10
+    max: 10
+  z:
+    min: -0.5
+    max: 0.3
+  intensity:
+    min: 40
+    max: 250
+
+pcl_cluster:
+  radius: 0.3
+  n_points:
+    min: 3
+    max: 500
+
+mean_cone_radius: 0.057 # m
