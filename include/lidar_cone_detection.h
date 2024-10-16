@@ -8,24 +8,19 @@
 /* ROS */
 #include <ros/ros.h>
 #include <sensor_msgs/PointCloud2.h>
-#include <pcl_ros/point_cloud.h>
-#include <pcl_conversions/pcl_conversions.h>
-#include <pcl/filters/passthrough.h>
-#include <pcl/segmentation/extract_clusters.h>
 
 /* SGT */
 #include <sgtdv_msgs/Point2DStampedArr.h>
-#include "../../SGT_Macros.h"
-#include "../../SGT_Utils.h"
-#include <sgtdv_msgs/DebugState.h>
+#include "SGT_Macros.h"
+#include "SGT_Utils.h"
 
 class LidarConeDetection
 {
 public:
-  LidarConeDetection(ros::NodeHandle& nh);
-
+  explicit LidarConeDetection(ros::NodeHandle& nh);
   ~LidarConeDetection() = default;
 
+private:
   void lidarCallback(const sensor_msgs::PointCloud2::ConstPtr &msg) const;
 
   struct Params
@@ -37,14 +32,11 @@ public:
     Utils::Range<double> z_range;
     double cluster_radius;
     double mean_cone_radius;
-  };
+  } params_;
 
-private:
   ros::Publisher publisher_;
   ros::Subscriber pcl_sub_;
 	
-  Params params_;
-
 #ifdef SGT_DEBUG_STATE
   ros::Publisher vis_debug_publisher_;
 #endif

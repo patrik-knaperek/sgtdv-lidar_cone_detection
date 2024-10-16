@@ -4,7 +4,7 @@
 /*****************************************************/
 
 
-#include "../include/lidar_cone_detection.h"
+#include "lidar_cone_detection.h"
 
 int main(int argc, char **argv)
 {

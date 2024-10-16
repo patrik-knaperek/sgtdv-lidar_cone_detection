@@ -3,7 +3,17 @@
 /* Authors: Juraj Krasňanský, Matej Dudák, Lukáš Lánik
 /*****************************************************/
 
-#include "../include/lidar_cone_detection.h"
+/* ROS */
+#include <pcl_ros/point_cloud.h>
+#include <pcl_conversions/pcl_conversions.h>
+#include <pcl/filters/passthrough.h>
+#include <pcl/segmentation/extract_clusters.h>
+
+/* SGT */
+#include <sgtdv_msgs/DebugState.h>
+
+/* Header */
+#include "lidar_cone_detection.h"
 
 LidarConeDetection::LidarConeDetection(ros::NodeHandle& nh) :
   /* ROS interface init */

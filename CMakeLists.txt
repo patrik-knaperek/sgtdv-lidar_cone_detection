@@ -28,8 +28,10 @@ catkin_package(
 )
 
 include_directories(
+  include
   ${catkin_INCLUDE_DIRS}
   ${EIGEN3_INCLUDE_DIRS}
+  ${CMAKE_SOURCE_DIR}/../
 )
 
 add_executable(${PROJECT_NAME} src/lidar_cone_detection_node.cpp src/lidar_cone_detection.cpp)
