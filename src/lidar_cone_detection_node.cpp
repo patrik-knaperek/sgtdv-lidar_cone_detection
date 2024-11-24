@@ -8,7 +8,7 @@
 
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "lidarConeDetection");
+  ros::init(argc, argv, "lidar_cone_detection");
   ros::NodeHandle handle;
   LidarConeDetection lidar_cone_detection(handle);
 

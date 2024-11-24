@@ -17,10 +17,10 @@
 
 LidarConeDetection::LidarConeDetection(ros::NodeHandle& nh) :
   /* ROS interface init */
-  publisher_(nh.advertise<sgtdv_msgs::Point2DStampedArr>("lidar_cones", 1)),
+  publisher_(nh.advertise<sgtdv_msgs::Point2DStampedArr>("lidar/cones", 1)),
   pcl_sub_(nh.subscribe("velodyne_points", 1, &LidarConeDetection::lidarCallback, this))
 #ifdef SGT_DEBUG_STATE
-, vis_debug_publisher_(nh.advertise<sgtdv_msgs::DebugState>("lidar_cone_detection_debug_state", 2))
+, vis_debug_publisher_(nh.advertise<sgtdv_msgs::DebugState>("lidar//debug_state", 2))
 #endif
 {
   /* Load ROS parameters from server */

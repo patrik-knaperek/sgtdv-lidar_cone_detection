@@ -10,7 +10,7 @@ ___
 
 ___
 
-`lidarConeDetection` node processes pointcloud data from `velodyne_driver` into estimated cone positions.  
+`lidar_cone_detection` node processes pointcloud data from `velodyne_driver` into estimated cone positions.  
 It works in 3 steps:
 - pointcloud filtering by intensity and Cartesian coordinates
 - pointcloud euclidean clustering (based of euclidean distance of points)
