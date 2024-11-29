@@ -34,7 +34,12 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/../
 )
 
-add_executable(${PROJECT_NAME} src/lidar_cone_detection_node.cpp src/lidar_cone_detection.cpp)
+add_executable(
+  ${PROJECT_NAME}
+  src/lidar_cone_detection_node.cpp
+  src/lidar_cone_detection_ros.cpp
+  src/lidar_cone_detection.cpp
+)
 
 target_link_libraries(lidar_cone_detection
   ${catkin_LIBRARIES}

@@ -5,24 +5,15 @@
 
 # pragma once
 
-/* ROS */
-#include <ros/ros.h>
 #include <sensor_msgs/PointCloud2.h>
 
 /* SGT */
 #include <sgtdv_msgs/Point2DStampedArr.h>
-#include "SGT_Macros.h"
 #include "SGT_Utils.h"
 
 class LidarConeDetection
 {
 public:
-  explicit LidarConeDetection(ros::NodeHandle& nh);
-  ~LidarConeDetection() = default;
-
-private:
-  void lidarCallback(const sensor_msgs::PointCloud2::ConstPtr &msg) const;
-
   struct Params
   {
     Utils::Range<double> cluster_points;
@@ -32,12 +23,19 @@ private:
     Utils::Range<double> z_range;
     double cluster_radius;
     double mean_cone_radius;
-  } params_;
+  };
 
-  ros::Publisher publisher_;
-  ros::Subscriber pcl_sub_;
-	
-#ifdef SGT_DEBUG_STATE
-  ros::Publisher vis_debug_publisher_;
-#endif
+public:
+  explicit LidarConeDetection() = default;
+  ~LidarConeDetection() = default;
+
+  sgtdv_msgs::Point2DStampedArr update(const sensor_msgs::PointCloud2::ConstPtr &msg) const;
+
+  void setParams(const Params& params)
+  {
+    params_ = params;
+  };
+
+private:
+  Params params_;
 };

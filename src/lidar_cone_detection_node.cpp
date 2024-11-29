@@ -4,13 +4,13 @@
 /*****************************************************/
 
 
-#include "lidar_cone_detection.h"
+#include "lidar_cone_detection_ros.h"
 
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "lidar_cone_detection");
   ros::NodeHandle handle;
-  LidarConeDetection lidar_cone_detection(handle);
+  LidarConeDetectionROS ros_obj(handle);
 
   ros::spin();
 

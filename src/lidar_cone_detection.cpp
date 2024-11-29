@@ -9,44 +9,11 @@
 #include <pcl/filters/passthrough.h>
 #include <pcl/segmentation/extract_clusters.h>
 
-/* SGT */
-#include <sgtdv_msgs/DebugState.h>
-
 /* Header */
 #include "lidar_cone_detection.h"
 
-LidarConeDetection::LidarConeDetection(ros::NodeHandle& nh) :
-  /* ROS interface init */
-  publisher_(nh.advertise<sgtdv_msgs::Point2DStampedArr>("lidar/cones", 1)),
-  pcl_sub_(nh.subscribe("velodyne_points", 1, &LidarConeDetection::lidarCallback, this))
-#ifdef SGT_DEBUG_STATE
-, vis_debug_publisher_(nh.advertise<sgtdv_msgs::DebugState>("lidar//debug_state", 2))
-#endif
+sgtdv_msgs::Point2DStampedArr LidarConeDetection::update(const sensor_msgs::PointCloud2::ConstPtr &msg) const
 {
-  /* Load ROS parameters from server */
-  Utils::loadParam(nh, "pcl_filter/x/min", &params_.x_range.min);
-  Utils::loadParam(nh, "pcl_filter/x/max", &params_.x_range.max);
-  Utils::loadParam(nh, "pcl_filter/y/min", &params_.y_range.min);
-  Utils::loadParam(nh, "pcl_filter/y/max", &params_.y_range.max);
-  Utils::loadParam(nh, "pcl_filter/z/min", &params_.z_range.min);
-  Utils::loadParam(nh, "pcl_filter/z/max", &params_.z_range.max);
-  Utils::loadParam(nh, "pcl_cluster/n_points/min", &params_.cluster_points.min);
-  Utils::loadParam(nh, "pcl_cluster/n_points/max", &params_.cluster_points.max);
-  Utils::loadParam(nh, "pcl_filter/intensity/min", &params_.intensity.min);
-  Utils::loadParam(nh, "pcl_filter/intensity/max", &params_.intensity.max);
-  Utils::loadParam(nh, "pcl_cluster/radius", &params_.cluster_radius);
-  Utils::loadParam(nh, "mean_cone_radius", &params_.mean_cone_radius);
-}
-
-void LidarConeDetection::lidarCallback(const sensor_msgs::PointCloud2::ConstPtr &msg) const
-{
-#ifdef SGT_DEBUG_STATE
-  sgtdv_msgs::DebugState state;
-  state.stamp = ros::Time::now();
-  state.working_state = 1;
-  vis_debug_publisher_.publish(state);
-#endif
-
   sgtdv_msgs::Point2DStampedArr cone_array;
   
   /* Pointcloud filtering */
@@ -144,13 +111,5 @@ void LidarConeDetection::lidarCallback(const sensor_msgs::PointCloud2::ConstPtr 
       }
     }
   }
-
-  publisher_.publish(cone_array);
-
-#ifdef SGT_DEBUG_STATE
-  state.num_of_cones = cone_array.points.size();
-  state.stamp = ros::Time::now();
-  state.working_state = 0;
-  vis_debug_publisher_.publish(state);
-#endif
+  return cone_array;
 }
