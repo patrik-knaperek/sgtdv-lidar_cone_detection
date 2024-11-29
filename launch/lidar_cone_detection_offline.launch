@@ -1,8 +1,13 @@
 <launch>
   <rosparam command="load" file="$(find lidar_cone_detection)/params/lidar_cone_detection.yaml"/>
 
-  <node pkg="lidar_cone_detection" type="lidar_cone_detection" name="lidar_cone_detection"/>
+  <node pkg="lidar_cone_detection" type="lidar_cone_detection" name="lidar_cone_detection" output="screen"/>
 
 	<node pkg="tf2_ros" type="static_transform_publisher" name="velodyne_to_lidar" 
     args="0 0 0 0 0 0 lidar velodyne" />
+
+  <node pkg="rosservice" 
+    type="rosservice" 
+    name="set_lidar_cone_detection_log_level" 
+    args="call /lidar_cone_detection/set_logger_level 'ros.lidar_cone_detection' 'info'" />
 </launch>

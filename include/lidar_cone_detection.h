@@ -5,6 +5,11 @@
 
 # pragma once
 
+/* C++ */
+#include <Eigen/Eigen>
+
+/* ROS */
+#include <pcl_ros/point_cloud.h>
 #include <sensor_msgs/PointCloud2.h>
 
 /* SGT */
@@ -29,7 +34,7 @@ public:
   explicit LidarConeDetection() = default;
   ~LidarConeDetection() = default;
 
-  sgtdv_msgs::Point2DStampedArr update(const sensor_msgs::PointCloud2::ConstPtr &msg) const;
+  sgtdv_msgs::Point2DStampedArr update(const sensor_msgs::PointCloud2::ConstPtr &msg);
 
   void setParams(const Params& params)
   {
@@ -37,5 +42,18 @@ public:
   };
 
 private:
+  Eigen::Vector2f calculateGradient(const pcl::PointXYZ &point, const pcl::PointIndices &cluster_indices,
+                                    const pcl::shared_ptr<pcl::PointCloud<pcl::PointXYZ>> &cloud_ptr) const;
+
+  void newtonGaussEstimation(const sgtdv_msgs::Point2DStampedArrPtr &cones, 
+                            std::vector<pcl::PointIndices> &cluster_indices, 
+                            const pcl::shared_ptr<pcl::PointCloud<pcl::PointXYZ>> cloud_ptr) const;
+
+  Eigen::Matrix2f calculateHessian(const pcl::PointXYZ &point, const pcl::PointIndices &cluster_indices, 
+                                  const pcl::shared_ptr<pcl::PointCloud<pcl::PointXYZ>> cloud_ptr) const;
+
   Params params_;
+
+  static constexpr float EPSILON_ERROR = 0.05; // 5cm
+  static constexpr int ITER_LIMIT = 10;
 };

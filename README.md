@@ -14,7 +14,7 @@ ___
 It works in 3 steps:
 - pointcloud filtering by intensity and Cartesian coordinates
 - pointcloud euclidean clustering (based of euclidean distance of points)
-- cone center estimation (centroid approximation based on average position vector of points in the cluster and mean cone radius)
+- cone center estimation (centroid approximation and Newton-Gauss estimation)
 
 **Note**: This version of algorithm cannot distinguish a cone from any other type of object
 
