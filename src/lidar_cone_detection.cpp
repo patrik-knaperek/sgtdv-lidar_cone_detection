@@ -28,7 +28,7 @@ void LidarConeDetection::lidarCallback(const sensor_msgs::PointCloud2::ConstPtr 
   
   /* Pointcloud filtering */
   
-  pcl::PCLPointCloud2 *cloud = new pcl::PCLPointCloud2;
+  pcl::PCLPointCloud2::Ptr cloud = pcl::make_shared<pcl::PCLPointCloud2>();
   pcl::PCLPointCloud2::ConstPtr cloud_ptr(cloud);
 
   pcl_conversions::toPCL(*msg, *cloud);
@@ -72,9 +72,9 @@ void LidarConeDetection::lidarCallback(const sensor_msgs::PointCloud2::ConstPtr 
      * https://pointclouds.org/documentation/classpcl_1_1_euclidean_cluster_extraction.html
      * using Euclidean cluster extraction to get clusters of CONE_CLUSTER_POINTS within CONE_CLUSTER_RADIUS
      */
-    pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_filtered(new pcl::PointCloud<pcl::PointXYZ>);
+    pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_filtered = pcl::make_shared<pcl::PointCloud<pcl::PointXYZ>>();
     pcl::fromPCLPointCloud2(*cloud, *cloud_filtered);
-    pcl::search::KdTree<pcl::PointXYZ>::Ptr tree(new pcl::search::KdTree<pcl::PointXYZ>);
+    pcl::search::KdTree<pcl::PointXYZ>::Ptr tree = pcl::make_shared<pcl::search::KdTree<pcl::PointXYZ>>();
     std::vector<pcl::PointIndices> cluster_indices;
     tree->setInputCloud(cloud_filtered);
     pcl::EuclideanClusterExtraction<pcl::PointXYZ> ec;
