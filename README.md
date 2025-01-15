@@ -19,20 +19,14 @@ It works in 3 steps:
 **Note**: This version of algorithm cannot distinguish a cone from any other type of object
 
 ### Related packages
-* `velodyne`
+* [`velodyne`](../velodyne/README.md)
 * `ros_pcl`
 
-### Setup
+### LiDAR setup
 
-1. connect to LIDAR according to [Getting Started with the Velodyne VLP16](http://wiki.ros.org/velodyne/Tutorials/Getting%20Started%20with%20the%20Velodyne%20VLP16)
-2. move to project home directory e.g. `cd ~/ros_implementation/`
-3. run:
-```sh
-    $ cd ${SGT_ROOT}/ros_implementation
-    $ source devel/setup.sh
-    $ git clone https://github.com/ros-drivers/velodyne.git src/velodyne
-    $ rosdep install --from-paths src --ignore-src --rosdistro $ROS_DISTRO -y
-```
+1. Connect the computer to LIDAR according to [Getting Started with the Velodyne VLP16](http://wiki.ros.org/velodyne/Tutorials/Getting%20Started%20with%20the%20Velodyne%20VLP16)
+2. Open web browser and connect to the IP adress `192.168.1.201` to configure LIDAR behaviour and data being sent using web interface (e. g. RPM, FOV, etc.). (*Here you set physical parameters of the LIDAR scanning - what data is sent from LIDAR to PC LAN interface.*)
+3. Set the laser parametres in the [driver's launchfile](../velodyne/velodyne_pointcloud/launch/VLP16_points.launch). (*Here you set data processing parameters of the velodyne ROS driver - what data is sent from PC LAN interface to ROS network.*)
 
 ## Compilation
 The following packages have to be built at first:
